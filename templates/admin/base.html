@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<!--[if IE 9]><html class="lt-ie10" lang="en" > <![endif]-->
+<html class="no-js" lang="en" >
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>e-Carte Administration</title>
+
+    <link rel="shortcut icon" type="image/png" href="/favicon.png">
+    <link rel="stylesheet" href="/css/normalize.css">
+    <link rel="stylesheet" href="/css/foundation.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
+
+    <script src="/js/lib/modernizr.js"></script>
+</head>
+<body>
+
+  {% block body %}{% endblock %}
+
+
+{% block css_and_js %}{% endblock %}
+
+{#{% macro mlang_values(val) -%}#}
+{#    data-en-value="{{ val.en }}" {% for lang in config.SUPPORTED_LANGS %}data-{{ lang }}-value="{{ val[lang] if lang in val else '' }}" {% endfor %}#}
+{#{%-endmacro  %}#}
+
+{#{% macro mlang_property(nm, val) -%}#}
+{#    data-{{ nm }}-en="{{ val.en }}" {% for lang in config.SUPPORTED_LANGS %}data-{{ nm }}-{{ lang }}="{{ val[lang] if lang in val else '' }}" {% endfor %}#}
+{#{%-endmacro  %}#}
+
+{% macro mlprops(langs) -%}
+    {% for nm,val in kwargs.iteritems() %}{% for lang in langs %}data-{{ nm }}-{{ lang }}="{{ val[lang] }}" {% endfor %}{% endfor %}
+{%-endmacro  %}
+
+{% macro input(name, value, languages, length_class) -%}
+    <div class="medium-2 columns">
+    {% set lbl = kwargs.label if 'label' in kwargs else name.split('_')|join(' ')|capitalize %}
+        <label class="right" for="id-{{ name }}">&nbsp;{{ lbl }}{% if lbl %}:{% endif %}</label>
+    </div>
+    {% if languages %}
+        {% set val,clazz = value.en, 'multilang' %}
+    {% else %}
+        {% set val,clazz = value, '' %}
+    {% endif %}
+    {% if 'classes' in kwargs %}
+        {% set clazz = clazz + ' ' + kwargs.classes %}
+    {% endif %}
+    <div class="{{ length_class }} columns">
+    {% if 'type' in kwargs %}
+        {% if kwargs.type == 'textarea' %}
+            <textarea name="{{ name }}" class="{{ clazz }}" id="id-{{ name }}" rows="{% if 'rows' in kwargs %}{{ kwargs.rows }}{% else %}3{% endif %}" {% if languages %}{{ mlprops(languages, value=value) }}{% endif %}>{{ val }}</textarea>
+        {% elif kwargs.type =='select' %}
+            <select name="{{ name }}" class="{{ clazz }}" id="id-{{ name }}">
+            {% for opt in kwargs.options.split(',') %}
+                <option{% if opt==val %} selected="selected"{% endif %}>{{ opt }}</option>
+            {% endfor %}
+            </select>
+        {% else %}
+            <input type="{{ kwargs.type }}" name="{{ name }}" class="{ clazz }}" id="id-{{ name }}" value="{{ val }}" {% if languages %}{{ mlprops(languages, value=value) }}{% endif %}/>
+        {% endif %}
+    {% else %}
+        <input type="text" name="{{ name }}" class="{{ clazz }}" id="id-{{ name }}" value="{{ val }}" {% if languages %}{{ mlprops(languages, value=value) }}{% endif %}/>
+    {% endif %}
+    {% if 'help_text' in kwargs %}
+        <small>{{ kwargs.help_text }}</small>
+    {% endif %}
+    </div>
+{%- endmacro %}
+
+    <script src="/js/lib/jquery.js"></script>
+    <script src="/js/lib/foundation.min.js"></script>
+    <script src="/tinymce/tinymce.min.js"></script>
+    <!-- TODO: Make sure to use the minified version -->
+    <script src="/js/lib/dmuploader.js"></script>
+
+    <script>
+        $(document).foundation();
+{% include 'admin/admin.js' %}
+    </script>
+</body>
+</html>
+

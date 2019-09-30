@@ -1,0 +1,12 @@
+flask
+flask-login
+bson
+flask-pymongo
+flask-wtf
+babel
+# PIL
+geopy (may be skipped if using geocoder.ca)
+python-slugify
+validate_email
+slugify
+openpyxl

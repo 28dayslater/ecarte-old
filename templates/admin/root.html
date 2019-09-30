@@ -1,0 +1,319 @@
+{% extends "admin/base.html" %}
+{% from 'admin/base.html' import input, hours_dropdown, mlprops %}
+{% block body %}
+
+{% macro print_entry(entry, langs) -%}
+    <li data-type="entry" {{ mlprops(langs, title=entry.title, description=entry.description) }}
+    {% for pr in entry.prices %}
+        {% set pridx = loop.index %}
+            data-price{{ pridx }}="{{ pr.amount }}"
+        {% for lang in langs %}
+            data-price_description{{ pridx }}-{{ lang }}="{{ pr.description[lang] }}"
+        {% endfor %}
+    {% endfor %}
+            data-peppers="{{ entry.peppers|int }}" data-markers="{{ entry.markers }}" data-photo="{{ entry.photo }}">
+        <a href="#menu-entry" class="tab">{{ entry.title.en }}</a>
+    </li>
+{%- endmacro %}
+
+    <div class="off-canvas-wrap" data-offcanvas>
+        <div class="inner-wrap">
+            <nav class="top-bar" data-topbar role="navigation">
+                <ul class="title-area">
+                    <li class="name">
+                        <h1><a href="#">Menu Administration</a></h1>
+                    </li>
+                </ul>
+                <section class="top-bar-section">
+                    <img id="loader-icon" src="/img/ajax-loader.gif">
+                    <ul class="right">
+                        <li class="menu-text">Logged in as: <span>{% if current_user.is_admin %}<img src="/img/uac.png" width="24">{% endif %} {{ current_user.username }}</span></li>
+                        <li><a href="/admin/logout">Logout</a></li>
+                    </ul>
+                </section>
+            </nav>
+            <aside class="left-off-canvas-menu">
+                <ul class="off-canvas-list">
+                    <li><label>Restaurants</label></li>
+                    {% for rr in rlist %}
+                        <li>
+                            <a href="/admin/{{ rr._id }}">
+                                <div>{{ rr.name }}</div>
+                                <div style="font-size:75%;">
+                                {% if 'locations' in rr and rr.locations|length>0 %}
+                                    {{ rr.locations[0].address1 }} {{ rr.locations[0].city }}, {{ rr.locations[0].province }}
+                                {% else %}
+                                    Unknown Address
+                                {% endif %}
+                                </div>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </aside>
+
+            <section class="main-section">
+                <div class="row">
+                    <div class="medium-3 columns">
+                        <ul class="side-nav">
+                            {% if rlist|length > 1 %}<li><a class="left-off-canvas-toggle menu-icon" href="#"><span></span><span>Select restaurant...</span></a></li>{% endif %}
+                            <li class="divider"></li>
+                            {% if current_user.is_admin %}<li><a id="import">Import from Excel...</a></li>{% endif %}
+                            <li class="divider"></li>
+                            <li><a href="#basic-data" class="tab active">Basic data</a></li>
+                            <li><a href="#location" class="tab">Location &amp; hours</a></li>
+                            <li class="divider"></li>
+                            <li id="nav-menu"><a href="#menu-section" class="tab menu">Menu</a>
+                                <ul>
+                            {% if restaurant and restaurant.menu %}
+                                {% set langs = restaurant.languages %}
+                                {% for cat in restaurant.menu %}
+                                    {% set catidx = loop.index0 %}
+                                    <li data-type="category" {{ mlprops(restaurant.languages, title=cat.title, description=cat.description) }}>
+                                        <a href="#menu-section" class="tab">{{ cat.title.en|upper }}
+                                            <img src="/img/category.svg" class="add-subcat" alt="Add subcategory">
+                                            <img src="/img/dish.svg" class="add-entry" alt="Add menu entry">
+                                        </a>
+                                        <ul>
+                                    {% if cat.subcategories %}
+                                        {% for subcat in cat.subcategories %}
+                                            {% set subcatidx = loop.index0 %}
+                                            <li data-type="subcategory" {{ mlprops(langs, title=subcat.title, description=subcat.description) }}>
+                                                <a href="#menu-section" class="tab">{{ subcat.title.en|upper }}
+                                                    <img src="/img/dish.svg" class="add-entry" alt="Add menu entry">
+                                                </a>
+                                                <ul>
+                                            {% if subcat.entries %}
+                                                {% for entry in subcat.entries %}
+                                                    {{ print_entry(entry, langs) }}
+                                                {% endfor %}
+                                            {% endif %}
+                                                </ul>
+                                            </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                    {% if cat.entries %}
+                                        {% for entry in cat.entries %}
+                                            {{ print_entry(entry, langs) }}
+                                        {% endfor %}
+                                    {% endif %}
+                                        </ul>
+                                    </li>
+                                {% endfor %}
+                            {% endif %}
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="medium-9 columns">
+                        <div id="page-title">
+                            <span>Basic Information</span>
+                            <div id="multi-lang-buttons">
+                                <img src="/img/lang/en.png" alt="English" class="active" data-lang="en">
+                        {% for lang in config.SUPPORTED_LANGS %}
+                                <img src="/img/lang/{{ lang }}.png" data-lang="{{ lang }}">
+                        {% endfor %}
+                            </div>
+                        </div>
+                        <div id="messages">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% for category, message in messages %}
+                            <div data-alert class="alert-box {{ category }}">{{ message | safe }}</div>
+                        {% endfor %}
+                    {% endwith %}
+
+                        </div>
+                        <form method="post" name="edit-form" action="/admin">
+                            <input type="hidden" id="id-rid" name="rid" value="{{ restaurant._id }}" >
+                            <input type="hidden" id="id-all_langs" value="{{ config.SUPPORTED_LANGS|join(',') }}" >
+                            <div id="basic-data">
+                                <div class="row">
+                                    {{ input('name', restaurant.name, None, 'medium-6') }}
+                                </div>
+                                <div class="row">
+                                    {{ input('slug', restaurant.slug, None, 'medium-6') }}
+                                </div>
+                                {% set dflt_lang = restaurant.languages[0] if restaurant else 'en' %}
+                                <div class="row" style="margin-bottom:0.5rem;">
+                                    <div class="medium-2  columns"><label class="right">Additional Languages:</label></div>
+                                    <div class="medium-9 columns" id="id-languages">
+                                    {% set langs = restaurant.languages %}
+                                    {% for group in config.SUPPORTED_LANGS_GROUPPED %}
+                                        <div class="langgroup">
+                                        {% for lang in group %}
+                                            <label><input type="checkbox" name="languages" value="{{ lang.0 }}" {% if lang.0 in langs %}checked="checked"{% endif %}>{{ lang.1 }}</label>
+                                        {% endfor %}
+                                        </div>
+                                    {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="row">{{ input('description', restaurant.description, langs, 'medium-9', type='textarea', classes='rte') }}</div>
+                                <div class="row">{{ input('keywords', restaurant.keywords|join(', '), None, 'medium-9', type='textarea', help_text='Comma-separated list of keywords for search engines (primary language only)') }}</div>
+                        {% if current_user.is_admin %}
+                                <hr>
+                                <div class="row">{{ input('contact_name', restaurant.contact_name, None, 'medium-4', label='Contact') }}</div>
+                                <div class="row">{{ input('contact_phone', restaurant.contact_phone, None, 'medium-4') }}</div>
+                                <div class="row">{{ input('contact_email', restaurant.contact_email, None, 'medium-4') }}</div>
+                                <hr>
+                                <div class="row" style="margin-bottom:1rem;">
+                                    <label>Login:</label>
+                                </div>
+                                <div class="row">{{ input('login_username', restaurant.managed_by.username, None, 'medium-4', label='Username') }}</div>
+                                <div class="row">{{ input('login_email', restaurant.managed_by.email, None, 'medium-4', label='Email') }}</div>
+                        {% endif %}
+                                <hr class="above-buttons">
+                                <div class="row">
+                                    <a id="save-bd" class="button tiny radius medium-offset-2">Save</a>
+                                </div>
+                            </div>
+                            </hr>
+                            <div id="location">
+                                {% set loc=restaurant.locations[0] if restaurant and 'locations' in restaurant else None %}
+                                <div class="row">{{ input('address1', loc.address1, None, 'medium-6', label='Address') }}</div>
+                                <div class="row">{{ input('address2', loc.address2, None, 'medium-6', label='') }}</div>
+                                <div class="row">{{ input('city', loc.city, None, 'medium-6') }}</div>
+                                <div class="row">{{ input('province', loc.province, None, 'medium-2', type='select', options='AB,BC,MB,NB,NL,NS,NT,NU,ON,QC,SK,YT') }}</div>
+                            {% if current_user.is_admin %}
+                                <div class="row">{{ input('latlong', '%f , %f' % (loc.lat,loc.long) if loc else '', None, 'medium-4', label='Lat/long') }}</div>
+                            {% endif %}
+                                <div class="row">{{ input('order_phone', loc.order_phone, None, 'medium-4') }}</div>
+                                <hr>
+                                <div class="row">
+                                    <label>Hours:</label>
+                                </div>
+                                <div class="row hours-help-text">
+                                    <div class="medium-2 columns">&nbsp;</div>
+                                    <div class="medium-5 columns help-text">
+                                        Format: 8AM - 10PM, 10:30AM - 9PM.<br>Leave blank if closed on that day.
+                                    </div>
+                                </div>
+                                {% macro print_hrs(hours) -%}{% if hours is string %}{{ hours }}{% else %}{{ hours[0] }} - {{ hours[1] }}{% endif %}{%- endmacro %}
+                                {% set days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] %}
+                                {% for x in range(0,7) %}
+                                    <div class="row">
+                                        {{ input('hrs%d'%x, print_hrs(loc.hours[x]) if loc else '', None, 'small-3', label=days[x]) }}
+                                    </div>
+                                {% endfor %}
+                            {% if restaurant %}
+                                <hr class="above-buttons">
+                                <div class="row">
+                                    <a id="save-loc" class="button tiny radius medium-offset-2">Save</a>
+                                </div>
+                            {% endif %}
+                            </div>
+                            <div id="menu-section">
+                                <div class="row">{{ input('category_title', '', langs, 'medium-8', label='Title') }}</div>
+                                <div class="row">{{ input('category_description', '', langs, 'medium-8', type='textarea', classes='rte', label='Description')}}</div>
+                            {% if restaurant %}
+                                <hr class="above-buttons">
+                                <div class="row">
+                                    <div class="medium-offset-2">
+                                        <a id="save-cat" class="button tiny radius">Save</a>
+                                        <a id="del-cat" class="button alert tiny radius">Delete</a><br>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            </div>
+                            <div id="menu-entry">
+                                <div class="row">{{ input('entry_title', '', langs, 'medium-8', label='Title') }}</div>
+                                <div class="row">{{ input('entry_description', '', langs, 'medium-8', label='Description', type='textarea', classes='rte') }}</div>
+                                <div class="row">
+                                    <div class="medium-2 columns">
+                                        <label class="right">Hot:</label>
+                                    </div>
+                                    <div class="medium-6 columns hotness">
+                                        <input type="hidden" name="peppers" id="id-peppers" value="0" >
+                                        <img src="/img/pepper.svg" data-peppers="1">
+                                        <img src="/img/pepper.svg" data-peppers="2">
+                                        <img src="/img/pepper.svg" data-peppers="3">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="medium-2 columns">
+                                        <label class="right">Markers:</label>
+                                    </div>
+                                    <div class="medium-6 columns" id="id-markers">
+                                        <label><input name="markers" type="checkbox" value="veg">Vegetarian</label>
+                                        <label><input name="markers" type="checkbox" value="gf">Gluten free</label>
+                                        <br>
+                                        <label><input name="markers" type="checkbox" value="sf">Seafood</label>
+                                        <label><input name="markers" type="checkbox" value="lc">Low calories</label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="medium-2 columns">
+                                        <label class="right">Price:</label>
+                                    </div>
+                                    <div class="medium-10 columns" id="id-prices">
+                                        <div>
+                                            <input type="text" class="price-amount" name="price1" id="id-price1" placeholder="Price"><input type="text" class="price-description multilang" name="price_description" placeholder="Description">
+                                            <div style="display:inline-block"><a class="button tiny add-price-row">+</a><a class="button tiny alert del-price-row">-</a></div>
+                                        </div>
+                                        <div>
+                                            <input type="text" class="price-amount" name="price2" id="id-price2" placeholder="Price"><input type="text" class="price-description multilang" name="price_description" placeholder="Description">
+                                        </div>
+                                        <div>
+                                            <input type="text" class="price-amount" name="price3" id="id-price3" placeholder="Price"><input type="text" class="price-description multilang" name="price_description" placeholder="Description">
+                                        </div>
+                                        <div>
+                                            <input type="text" class="price-amount" name="price4" id="id-price4" placeholder="Price"><input type="text" class="price-description multilang" name="price_description" placeholder="Description">
+                                        </div>
+                                        <div>
+                                            <input type="text" class="price-amount" name="price5" id="id-price5" placeholder="Price"><input type="text" class="price-description multilang" name="price_description" placeholder="Description">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row" id="photo-div">
+                                    <div class="medium-2 columns">
+                                        <label class="right">Photo:</label>
+                                    </div>
+                                    <div class="medium-10 columns">
+                                        <div id="id-photo">
+                                            <img src="/img/dish.svg">
+                                            <input type="file" name="photo-file">
+                                            <input type="hidden" name="entry_photo" id="id-entry_photo">
+                                            <div id="upload-progress"><div>&nbsp;</div></div>
+                                        </div>
+                                        <span class="help">Drag and drop a file on the image<br>or click to browse.</span>
+                                        <span class="error">Only JPEG images are allowed.</span>
+                                    </div>
+                                </div>
+                            {% if restaurant %}
+                                <hr class="above-buttons">
+                                <div class="row">
+                                    <div class="medium-offset-2">
+                                        <a id="save-entry" class="button tiny radius">Save</a>
+                                        <a id="del-entry" class="button alert tiny radius">Delete</a><br>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </section>
+
+            <a class="exit-off-canvas"></a>
+        </div>
+    </div>
+
+    <form method="post" action="/admin/root/import" enctype="multipart/form-data" name="import-form">
+        <input type="file" id="xlsfile" name="xlsfile" style="display:none;"/>
+    </form>
+
+    <div id="delete-cat-question" class="reveal-modal small" data-reveal>
+        <h4>Are you sure to delete this menu section?</h4>
+        <p>You will loose all menu entries that belong to this category.</p>
+        <a class="button tiny radius alert" rel="del">Delete</a>
+        <a class="button tiny radius">Cancel</a>
+        <a class="close-reveal-modal"></a>
+    </div>
+
+    <div id="delete-entry-question" class="reveal-modal small" data-reveal>
+        <h4>Are you sure to delete this menu entry?</h4>
+        <a class="button tiny radius alert" rel="del">Delete</a>
+        <a class="button tiny radius">Cancel</a>
+        <a class="close-reveal-modal"></a>
+    </div>
+{% endblock %}

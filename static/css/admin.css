@@ -1,0 +1,447 @@
+/*html, body, .off-canvas-wrap, .inner-wrap, .main-section {
+    height:100%;
+    min-height: 100%;
+}*/
+
+.menu-text {
+    color: white;
+    font-size: 0.8125rem;
+    height: 45px;
+    line-height: 45px;
+    padding-right: 0.5rem;
+    border-right: #777 solid 1px;
+}
+
+.menu-text span {
+    color: orange;
+}
+
+.inner-wrap {
+    height: 100vh;
+    /*background-color: #FEFEFA;*/
+}
+
+#loader-icon {
+    width: 1.2rem;
+    height: 1.2rem;
+    display: none;
+}
+
+#page-title {
+    margin-bottom: 2rem;
+    color: #4096EE;
+    font-size: 18px;
+    padding-bottom: 0.5rem;
+    border-bottom: solid #4096EE 1px;
+}
+
+/* temporary patches for inputs. TODO: change sizing on large screens with saas */
+form .row .columns {
+    padding-left: 0;
+}
+
+form input[type=text], form select, form input[type=password] {
+    height: 1.5rem;
+    padding: 0.25rem;
+    margin-bottom: 0.75rem;
+}
+
+form input[type=checkbox] {
+    margin: 0.1rem 0.25rem 0.5rem 0;
+}
+
+form textarea {
+    margin-bottom: 0.75rem;
+}
+
+form select {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+form label {
+    font-size: 80%;
+}
+
+form textarea + small, form input + small {
+    margin-top: -0.5rem;
+    margin-bottom: 0.75rem;
+    display: block;
+    font-size: 70%;
+    color: #888;
+}
+
+[class*="column"] + [class*="column"]:last-child {
+    float: left; /* foundation makes it float right */
+    margin-left: 0;
+}
+
+@media only screen and (max-width: 39.9em) {
+    label.right {
+        text-align: left; /* on small screen label goes on top of the input and must have left-aligned text */
+    }
+}
+
+.langgroup {
+    clear: both;
+}
+
+.langgroup label {
+    display: inline-block;
+    min-width: 6rem;
+    max-width: 6rem;
+}
+
+#id-markers label {
+    display: inline-block;
+    min-width: 6rem;
+    max-width: 6rem;
+}
+
+.main-section > .row > div {
+    padding-top: 1rem;
+
+}
+
+.main-section > div.row {
+    margin-left: 0;
+}
+
+ul.side-nav {
+    padding: 0;
+}
+
+ul.side-nav li {
+    margin-bottom: 0.15rem;
+}
+
+ul.side-nav li a:not(button) {
+    padding: 0.2rem 0 0 10px !important;
+    color: #4096EE !important;
+}
+
+ul.side-nav a:hover {
+    background-color: transparent !important;
+    border-left: solid #4096EE 1px !important;
+    padding-left: 9px !important;
+}
+
+ul.side-nav a.active:hover {
+    border-left: solid #4096EE 5px !important;
+    padding-left: 5px !important;
+}
+
+ul.side-nav .active {
+    border-left: solid #4096EE 5px;
+    padding-left: 5px !important;
+}
+
+ul.side-nav li a.tempcat, ul.side-nav li a.tempentry {
+    color: #b3b3b3 !important;
+}
+
+.row .row {
+    margin: 0;
+}
+
+.button.tiny {
+    padding: 0.3rem 1.5rem;
+    font-size: 0.9rem;
+    border-radius: 5px;
+    /* linear-gradient(to top, #008cba, #00bcea) */
+}
+
+/* TODO: Add gradients to the foundation scss buttons
+.button.tiny:hover {
+    background-image: linear-gradient(to top, #008cba, #00bcea);
+}
+
+.button.tiny.alert:hover {
+    background-image: linear-gradient(to top, #f04124, #ff8164);
+}*/
+
+ul.messages.error {
+    border: dotted #C00000 1px;
+    color: #C00000;
+    list-style: none;
+    margin-bottom: 1rem;
+}
+
+ul.messages.ok {
+    border: dotted #00A000 1px;
+    color: #00A000;
+    list-style: none;
+    margin-bottom: 1rem;
+
+}
+
+ul.messages li {
+    padding: 0 0.5rem 0.2rem 0;
+    margin-left: 1.3rem;
+    font-size: 0.8rem;
+}
+
+ul.error-messages li:first-child {
+    padding: 0.2rem 0.5rem 0 0;
+}
+
+form small.error {
+    margin: -0.75rem 0 0.7rem 0;
+    padding: 0.2rem 0.5rem;
+}
+
+.side-nav ul {
+    list-style: none;
+    padding-left: 0.75em;
+    margin-left: 0;
+}
+
+.side-nav ul li {
+    margin-left: 0;
+}
+
+/*ul.sortable-sections {
+    margin:0;
+}
+
+ul.sortable-sections li {
+    list-style: none;
+    border: solid #A0A0A0 1px;
+    margin: 0 0 0.2em 0;
+    padding: 0.1em 0 0.1em 0.875em;
+    cursor: ns-resize;
+    border-radius: 5px;
+}*/
+
+.alert-box.alert h5 {
+    color: white;
+}
+
+.alert-box.alert ul {
+    margin-bottom: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    list-style-type: square;
+}
+
+#supported-languages {
+    padding: 0;
+}
+
+#supported-languages option {
+    background-size: 24px;
+    background-position: left center;
+    background-repeat: no-repeat;
+    padding: 0 3px 3px 30px;
+    vertical-align: middle;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+select:focus {
+    -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,0.098);
+    -moz-box-shadow: inset 0 1px 2px rgba(0,0,0,0.098);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.098);
+}
+
+#messages .alert {
+    background-color: inherit;
+    color: #F04124;
+    border: none;
+    border-bottom: #F04124 solid 1px;
+    padding-left: 0;
+    font-weight: bold;
+    margin-bottom: 2rem;
+}
+
+#messages .success {
+    background-color: inherit;
+    color: #43ac6a;
+    border: none;
+    border-bottom: #43ac6a solid 1px;
+    padding-left: 0;
+    font-weight: bold;
+    margin-bottom: 2rem;
+}
+/* show basic data section on page entry */
+#location, #menu-section, #menu-entry {
+    display: none;
+}
+
+.row.hours-help-text {
+    font-size: 75%;
+    line-height: 120%;
+    margin-bottom: 0.75rem;
+}
+
+.help-text {
+    color: #999;
+}
+
+form hr {
+    margin-left: 16.7%;
+}
+
+#nav-menu img.add-subcat {
+    display: none;
+}
+
+#nav-menu img.add-entry {
+    display: none;
+}
+
+#nav-menu a.active:hover img.add-subcat {
+    display: block;
+    float: right;
+    width: 20px;
+    height: 20px;
+}
+
+#nav-menu a.active:hover img.add-entry {
+    display: block;
+    float: right;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+#nav-menu a.active.temp:hover img.add-subcat {
+    display: none;
+}
+
+#nav-menu a.active.temp:hover img.add-entry {
+    display: none;
+}
+
+.hotness  {
+    margin-bottom: 0.5rem;
+}
+
+.hotness img {
+    width: 18px;
+    height:24px;
+    cursor: pointer;
+}
+
+form .button.alert {
+    margin-left: 0.75rem;
+}
+
+#id-markers {
+    margin-bottom: 0.75rem;
+}
+
+.button.add-price-row, .button.alert.del-price-row {
+    padding: 0.2rem 0.3rem;
+    width: 1.2rem;
+    margin: 0 0.2rem 0 0;
+}
+
+#id-prices input.price-amount {
+    margin-bottom:0.25rem;
+    display: inline-block;
+    width: 3rem;
+}
+
+#id-prices input.price-description {
+    margin-bottom:0.25rem;
+    margin-left: 0.2rem;
+    display: inline-block;
+    width: 17rem;
+}
+
+#id-prices small.error {
+    margin: -0.25rem 0 0.25rem 0;
+    width: 20.2rem;
+}
+
+#id-prices > div {
+    display: none;
+}
+
+#id-prices > div:first-child {
+    display: block;
+}
+
+#multi-lang-buttons {
+    float: right;
+}
+
+#multi-lang-buttons img {
+    width: 32px;
+    margin-top: -12px;
+    display: none;
+    border: none;
+    cursor: pointer;
+}
+
+#multi-lang-buttons img.active {
+    border-bottom: orangered 2px solid;
+}
+
+#photo-div {
+    padding-top: 0.75rem;
+}
+
+#id-photo {
+    display: inline-block;
+    position: relative;
+    width: 8rem;
+    height: 8rem;
+    cursor: pointer;
+    border: solid 1px #aaa;
+    padding: 0.2rem;
+    border-radius: 3px;
+}
+
+#id-photo input[type=file] {
+    display: none;
+}
+
+#id-photo.hover {
+    border: solid 1px #10F010;
+    background-color: lightgreen;
+}
+
+#photo-div span.help {
+    display: inline-block;
+    padding: 1rem 0 0 1rem;
+    font-size: 80%;
+    line-height: 125%;
+}
+
+#photo-div span.error {
+    display: none;
+    width: 20rem;
+    background-color: transparent;
+    color: #f04124;
+    padding-left: 0;
+}
+
+#upload-progress {
+    margin: 0;
+    position: absolute;
+    bottom: -1px;
+    width: 7.5rem;
+    height: 5px;
+    border: solid 1px #A0A0A0;
+    display: none;
+}
+
+#upload-progress > div {
+    background-color: #00A000;
+    width: 0;
+    height: 100%;
+}
+
+.mce-tinymce {
+    margin-bottom: 0.75rem !important;
+}
+
+.mce-tinymce button:hover {
+    background-color: lightgrey;
+}
+
+textarea.rte {
+    display: none;
+}
